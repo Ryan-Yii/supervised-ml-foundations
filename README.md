@@ -1,4 +1,4 @@
-# ai-learning-week01
+# supervised-ml-foundations
 
 一个面向机器学习初学者的第一周学习仓库。项目以 Python、物联网（IoT）和边缘计算（Edge Computing）基础为起点，用小而完整的实验理解数据、模型、评估与数据泄漏（Data Leakage）。作者：Ryan-Yii。
 
@@ -24,7 +24,7 @@
 ## 项目结构
 
 ```text
-ai-learning-week01/
+supervised-ml-foundations/
 ├── README.md
 ├── requirements.txt
 ├── .gitignore
