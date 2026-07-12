@@ -1,0 +1,206 @@
+{
+  "dataset": "UCI AI4I 2020 Predictive Maintenance Dataset (id=601)",
+  "random_state": 42,
+  "target": "Machine failure",
+  "feature_columns": [
+    "Type",
+    "Air temperature [K]",
+    "Process temperature [K]",
+    "Rotational speed [rpm]",
+    "Torque [Nm]",
+    "Tool wear [min]"
+  ],
+  "excluded_leakage_columns": [
+    "UID",
+    "UDI",
+    "Product ID",
+    "Machine failure",
+    "TWF",
+    "HDF",
+    "PWF",
+    "OSF",
+    "RNF"
+  ],
+  "splits": {
+    "train_rows": 6000,
+    "validation_rows": 2000,
+    "test_rows": 2000,
+    "strategy": "stratified 60/20/20"
+  },
+  "cross_validation": {
+    "strategy": "StratifiedKFold(n_splits=5, shuffle=True, random_state=42)",
+    "models": [
+      {
+        "model_key": "random_forest_balanced",
+        "model": "RandomForestClassifier (balanced)",
+        "class_weight": "balanced",
+        "cv_accuracy_mean": 0.977,
+        "cv_accuracy_std": 0.006904105059069326,
+        "cv_precision_mean": 0.6989547143721372,
+        "cv_precision_std": 0.12264410124357776,
+        "cv_recall_mean": 0.5808536585365854,
+        "cv_recall_std": 0.10059726456082571,
+        "cv_f1_mean": 0.6313277997169895,
+        "cv_f1_std": 0.10096411648942133,
+        "cv_roc_auc_mean": 0.9654770027107125,
+        "cv_roc_auc_std": 0.010106962519159735,
+        "cv_pr_auc_mean": 0.7078087111776842,
+        "cv_pr_auc_std": 0.057993377790782306
+      },
+      {
+        "model_key": "decision_tree_balanced",
+        "model": "DecisionTreeClassifier (balanced)",
+        "class_weight": "balanced",
+        "cv_accuracy_mean": 0.9755,
+        "cv_accuracy_std": 0.003519785346990466,
+        "cv_precision_mean": 0.6478279899332532,
+        "cv_precision_std": 0.05858085485331526,
+        "cv_recall_mean": 0.6057317073170732,
+        "cv_recall_std": 0.048366536285356566,
+        "cv_f1_mean": 0.6260483819977491,
+        "cv_f1_std": 0.053162032287768904,
+        "cv_roc_auc_mean": 0.7970870907535352,
+        "cv_roc_auc_std": 0.02517742902571439,
+        "cv_pr_auc_mean": 0.408568608847813,
+        "cv_pr_auc_std": 0.0638044165755657
+      },
+      {
+        "model_key": "decision_tree",
+        "model": "DecisionTreeClassifier",
+        "class_weight": "none",
+        "cv_accuracy_mean": 0.9736666666666667,
+        "cv_accuracy_std": 0.003929942040850537,
+        "cv_precision_mean": 0.621682918983282,
+        "cv_precision_std": 0.0755766993213208,
+        "cv_recall_mean": 0.6301219512195122,
+        "cv_recall_std": 0.054877506772391164,
+        "cv_f1_mean": 0.6194570197965656,
+        "cv_f1_std": 0.024064261180508726,
+        "cv_roc_auc_mean": 0.8079014147517037,
+        "cv_roc_auc_std": 0.025128159303922176,
+        "cv_pr_auc_mean": 0.4006960010530016,
+        "cv_pr_auc_std": 0.02797306185103719
+      },
+      {
+        "model_key": "random_forest",
+        "model": "RandomForestClassifier",
+        "class_weight": "none",
+        "cv_accuracy_mean": 0.9796666666666667,
+        "cv_accuracy_std": 0.0032317865716108736,
+        "cv_precision_mean": 0.9040030557677616,
+        "cv_precision_std": 0.06500810344323771,
+        "cv_recall_mean": 0.4479268292682927,
+        "cv_recall_std": 0.08823707991800767,
+        "cv_f1_mean": 0.5937389514350027,
+        "cv_f1_std": 0.08588068522553209,
+        "cv_roc_auc_mean": 0.9654800257755337,
+        "cv_roc_auc_std": 0.009826388798383826,
+        "cv_pr_auc_mean": 0.7541317417997896,
+        "cv_pr_auc_std": 0.05575358095250844
+      },
+      {
+        "model_key": "logistic",
+        "model": "LogisticRegression",
+        "class_weight": "none",
+        "cv_accuracy_mean": 0.97,
+        "cv_accuracy_std": 0.0013944333775567717,
+        "cv_precision_mean": 0.704047619047619,
+        "cv_precision_std": 0.0584163646192469,
+        "cv_recall_mean": 0.1969512195121951,
+        "cv_recall_std": 0.0675041585516978,
+        "cv_f1_mean": 0.3015084376500129,
+        "cv_f1_std": 0.0816534784916307,
+        "cv_roc_auc_mean": 0.8962987811227595,
+        "cv_roc_auc_std": 0.024340488440795473,
+        "cv_pr_auc_mean": 0.4691500336561245,
+        "cv_pr_auc_std": 0.07829468603149639
+      },
+      {
+        "model_key": "logistic_balanced",
+        "model": "LogisticRegression (balanced)",
+        "class_weight": "balanced",
+        "cv_accuracy_mean": 0.8238333333333333,
+        "cv_accuracy_std": 0.01652103036872836,
+        "cv_precision_mean": 0.1376151716595789,
+        "cv_precision_std": 0.015700745236162675,
+        "cv_recall_mean": 0.7935365853658537,
+        "cv_recall_std": 0.08450577176166783,
+        "cv_f1_mean": 0.23436233541656276,
+        "cv_f1_std": 0.025713034756422955,
+        "cv_roc_auc_mean": 0.8980548696129533,
+        "cv_roc_auc_std": 0.021336993464959993,
+        "cv_pr_auc_mean": 0.4388531210394914,
+        "cv_pr_auc_std": 0.0680203572366831
+      },
+      {
+        "model_key": "dummy",
+        "model": "DummyClassifier",
+        "class_weight": "none",
+        "cv_accuracy_mean": 0.9661666666666667,
+        "cv_accuracy_std": 0.0004082482904638724,
+        "cv_precision_mean": 0.0,
+        "cv_precision_std": 0.0,
+        "cv_recall_mean": 0.0,
+        "cv_recall_std": 0.0,
+        "cv_f1_mean": 0.0,
+        "cv_f1_std": 0.0,
+        "cv_roc_auc_mean": 0.5,
+        "cv_roc_auc_std": 0.0,
+        "cv_pr_auc_mean": 0.03383333333333334,
+        "cv_pr_auc_std": 0.00040824829046386227
+      }
+    ]
+  },
+  "selection": {
+    "model_key": "random_forest_balanced",
+    "model": "RandomForestClassifier (balanced)",
+    "class_weight": "balanced",
+    "selection_priority": [
+      "cv_f1_mean",
+      "cv_recall_mean",
+      "cv_pr_auc_mean"
+    ],
+    "threshold": 0.47000000000000003,
+    "threshold_selected_on": "validation_set_only"
+  },
+  "validation": {
+    "at_0_50": {
+      "accuracy": 0.976,
+      "precision": 0.6785714285714286,
+      "recall": 0.5588235294117647,
+      "f1": 0.6129032258064516,
+      "roc_auc": 0.9471098221897455,
+      "pr_auc": 0.6858591221116264
+    },
+    "at_selected_threshold": {
+      "accuracy": 0.978,
+      "precision": 0.7,
+      "recall": 0.6176470588235294,
+      "f1": 0.65625,
+      "roc_auc": 0.9471098221897455,
+      "pr_auc": 0.6858591221116264
+    }
+  },
+  "final_test_once": {
+    "accuracy": 0.9815,
+    "precision": 0.7627118644067796,
+    "recall": 0.6617647058823529,
+    "f1": 0.7086614173228346,
+    "roc_auc": 0.9740629947631226,
+    "pr_auc": 0.727414562264675
+  },
+  "artifacts": {
+    "model": "outputs/iot_failure_prediction/final_model.joblib",
+    "threshold": "outputs/iot_failure_prediction/decision_threshold.json",
+    "model_comparison": "outputs/iot_failure_prediction/model_comparison.csv",
+    "confusion_matrix": "outputs/iot_failure_prediction/confusion_matrix.png",
+    "precision_recall_curve": "outputs/iot_failure_prediction/precision_recall_curve.png",
+    "threshold_analysis": "outputs/iot_failure_prediction/threshold_analysis.png",
+    "feature_importance": "outputs/iot_failure_prediction/feature_importance.png",
+    "false_positives": "outputs/iot_failure_prediction/false_positives.csv",
+    "false_negatives": "outputs/iot_failure_prediction/false_negatives.csv",
+    "error_analysis": "outputs/iot_failure_prediction/error_analysis.md",
+    "feature_importance_csv": "outputs/iot_failure_prediction/feature_importance.csv",
+    "threshold_analysis_csv": "outputs/iot_failure_prediction/validation_threshold_analysis.csv"
+  }
+}

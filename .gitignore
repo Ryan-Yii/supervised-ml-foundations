@@ -1,0 +1,24 @@
+# Python 虚拟环境与缓存
+.venv/
+__pycache__/
+**/__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+
+# 编辑器与操作系统文件
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# 临时文件与本地配置
+*.log
+*.tmp
+*.temp
+.env
+
+# 数据下载缓存与本地数据副本（不提交）
+.cache/
+data/
+ucimlrepo/
