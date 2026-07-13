@@ -1,6 +1,6 @@
-# AI4I 设备故障预测：可复现基线项目
+# AI4I 设备故障预测
 
-这是 `supervised-ml-foundations` 的 Day 6 项目：以 UCI AI4I 2020 Predictive Maintenance Dataset 为基础，预测设备是否发生故障（`Machine failure`）。它关注一个适合初学者审查的完整流程：无泄漏特征、统一数据划分、多模型对比、验证集阈值选择、最终一次测试评估，以及可加载的单条预测。
+这是 `supervised-ml-foundations` 的 Day 6 项目：以 UCI AI4I 2020 Predictive Maintenance Dataset 为基础，预测设备是否发生故障（`Machine failure`）。项目覆盖无泄漏特征、统一数据划分、多模型对比、验证集阈值选择、最终一次测试评估，以及可加载的单条预测。
 
 ## 问题定义
 
