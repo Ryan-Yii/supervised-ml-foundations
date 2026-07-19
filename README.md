@@ -1,6 +1,6 @@
 # supervised-ml-foundations
 
-第一周监督学习（Supervised Machine Learning）项目记录。项目以 Python、物联网（IoT）和边缘计算（Edge Computing）基础为起点，通过一组小而完整的实验梳理数据、模型、评估与数据泄漏（Data Leakage）。
+覆盖 Week 1 与 Week 2、Day 01–Day 14 的监督学习（Supervised Machine Learning）项目记录。项目以 Python、物联网（IoT）和边缘计算（Edge Computing）基础为起点，通过一组小而完整的实验梳理数据、模型、评估、模型选择与数据泄漏（Data Leakage）。
 
 ## 本周实践重点
 
@@ -35,23 +35,41 @@ supervised-ml-foundations/
 │   ├── day02_data_split_pipeline.py
 │   ├── day03_linear_regression.py
 │   ├── day04_logistic_regression.py
-│   └── day05_overfitting.py
+│   ├── day05_overfitting.py
+│   ├── day08_knn.py
+│   ├── day09_decision_tree.py
+│   ├── day10_random_forest.py
+│   ├── day11_svm.py
+│   ├── day12_cross_validation.py
+│   └── day13_model_comparison.py
 ├── projects/
 │   └── iot_failure_prediction/
 │       ├── README.md
 │       ├── train.py
-│       └── predict.py
+│       ├── predict.py
+│       ├── model_comparison.py
+│       ├── tune_models.py
+│       └── error_analysis.py
 ├── outputs/
-│   ├── regression/
 │   ├── classification/
+│   ├── cross_validation/
+│   ├── decision_tree/
 │   ├── overfitting/
-│   └── iot_failure_prediction/
+│   ├── iot_failure_prediction/
+│   ├── knn/
+│   ├── model_comparison/
+│   ├── random_forest/
+│   ├── regression/
+│   └── svm/
 ├── tests/
 │   ├── test_smoke.py
-│   └── test_iot_failure_prediction.py
+│   ├── test_iot_failure_prediction.py
+│   ├── test_model_selection.py
+│   └── test_week02_smoke.py
 └── docs/
+    ├── learning_checklist.md
     ├── week01_notes.md
-    └── learning_checklist.md
+    └── week02_model_selection.md
 ```
 
 ## 运行环境
