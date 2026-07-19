@@ -12,6 +12,7 @@ from unittest.mock import patch
 import numpy as np
 import pandas as pd
 from sklearn.compose import ColumnTransformer
+from sklearn.preprocessing import StandardScaler
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
@@ -119,6 +120,20 @@ class IoTFailurePredictionTests(unittest.TestCase):
         self.assertIsInstance(pipeline.named_steps["preprocessor"], ColumnTransformer)
         self.assertEqual(pipeline.predict_proba(x_data[:1]).shape, (1, 2))
 
+    def test_legacy_pipeline_uses_model_specific_numeric_preprocessing(self) -> None:
+        """The compatibility factory scales only linear and distance-based models."""
+        from train import build_model_pipeline
+
+        def numeric_transformer(model_name: str) -> object:
+            pipeline = build_model_pipeline(model_name, class_weight=None)
+            preprocessor = pipeline.named_steps["preprocessor"]
+            return next(transformer for name, transformer, _ in preprocessor.transformers if name == "numeric")
+
+        for model_name in ("logistic", "knn", "svm"):
+            self.assertIsInstance(numeric_transformer(model_name), StandardScaler)
+        for model_name in ("decision_tree", "random_forest"):
+            self.assertEqual(numeric_transformer(model_name), "passthrough")
+
     def test_saved_model_and_threshold_can_be_loaded_for_prediction(self) -> None:
         """保存后的模型与阈值可被重新加载并用于单样本预测。"""
         from predict import load_model_artifacts, predict_device_state
@@ -143,6 +158,33 @@ class IoTFailurePredictionTests(unittest.TestCase):
         self.assertGreaterEqual(probability, 0.0)
         self.assertLessEqual(probability, 1.0)
         self.assertEqual(threshold, 0.40)
+
+    def test_day14_decision_tree_saved_inference_contract(self) -> None:
+        """A saved Day 14-style tree uses FEATURE_COLUMNS and threshold 0.19 after reload."""
+        from predict import load_model_artifacts, predict_device_state, validate_device_state
+        from train import FEATURE_COLUMNS, build_model_pipeline, save_model_artifacts
+
+        x_data = self.make_feature_frame(rows=30).drop(columns=["UDI", "Product ID"])
+        y_data = pd.Series(np.array([0] * 15 + [1] * 15))
+        model = build_model_pipeline("decision_tree", class_weight=None)
+        model.set_params(classifier__max_depth=8, classifier__min_samples_leaf=1)
+        model.fit(x_data, y_data)
+        device_state = x_data.iloc[-1].to_dict()
+
+        with tempfile.TemporaryDirectory() as temporary_directory:
+            output_dir = Path(temporary_directory)
+            save_model_artifacts(model, threshold=0.19, output_dir=output_dir)
+            loaded_model, threshold = load_model_artifacts(output_dir)
+            prediction, probability = predict_device_state(loaded_model, threshold, device_state)
+
+        validated_state = validate_device_state(device_state)
+        expected_frame = pd.DataFrame([validated_state], columns=list(FEATURE_COLUMNS))
+        failure_index = list(loaded_model.classes_).index(1)
+        expected_probability = float(loaded_model.predict_proba(expected_frame)[0][failure_index])
+        self.assertEqual(tuple(expected_frame.columns), FEATURE_COLUMNS)
+        self.assertEqual(threshold, 0.19)
+        self.assertEqual(probability, expected_probability)
+        self.assertEqual(prediction, int(expected_probability >= 0.19))
 
     def test_invalid_device_state_reports_clear_error(self) -> None:
         """缺失字段和无效数值会在预测前被拒绝。"""

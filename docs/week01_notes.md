@@ -1,5 +1,9 @@
 # 第一周机器学习笔记
 
+## Day 6 历史实验快照（不代表当前模型）
+
+第一周的 Day 6 曾以固定 `random_state=42` 和 60/20/20 分层切分，比较 Dummy、Logistic Regression、Decision Tree 与 Random Forest（含部分 `class_weight="balanced"` 变体），并只在验证集选择阈值。该旧版候选流程的历史快照为：平衡随机森林、阈值 `0.4700`、测试 F1 `0.7087`。它不包含 Day 14 的 KNN/SVM 候选和训练集 GridSearchCV 调参，因此**不代表当前模型，因实验协议不同不能直接与 Day 14 比较**。当前可复现的最终结果以根 README 的 Day 14 说明和 `outputs/iot_failure_prediction/final_test_metrics.json` 为准。
+
 ## Feature 与 Label
 
 特征（Feature）是模型用于预测的输入变量，常记作 `X`。标签（Label）是要预测的答案，常记作 `y`。例如 Day 6 中温度、扭矩和设备类型是特征，`Machine failure` 是标签。训练特征中不能包含标签本身，也不能包含由标签直接推导出的信息。

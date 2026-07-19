@@ -20,10 +20,6 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-from sklearn.compose import ColumnTransformer
-from sklearn.dummy import DummyClassifier
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import (
     ConfusionMatrixDisplay,
     accuracy_score,
@@ -38,8 +34,6 @@ from sklearn.metrics import (
 )
 from sklearn.model_selection import StratifiedKFold, cross_validate, train_test_split
 from sklearn.pipeline import Pipeline
-from sklearn.preprocessing import OneHotEncoder, StandardScaler
-from sklearn.tree import DecisionTreeClassifier
 
 
 SRC_DIR = Path(__file__).resolve().parents[2] / "src"
@@ -47,6 +41,13 @@ if str(SRC_DIR) not in sys.path:
     sys.path.insert(0, str(SRC_DIR))
 
 from common import ensure_output_dir
+from error_analysis import save_error_analysis as save_day14_error_analysis
+from model_comparison import (
+    build_model_pipeline as build_day14_model_pipeline,
+    compare_models_cv as compare_day14_models_cv,
+    model_configurations as day14_model_configurations,
+)
+from tune_models import tune_promising_models
 
 
 RANDOM_STATE = 42
@@ -168,35 +169,8 @@ def split_dataset(x_data: pd.DataFrame, y_data: pd.Series) -> DatasetSplits:
 
 
 def build_model_pipeline(model_name: str, class_weight: str | None) -> Pipeline:
-    """构建包含 ColumnTransformer 的可复现分类 Pipeline。"""
-    preprocessor = ColumnTransformer(
-        transformers=[
-            ("numeric", StandardScaler(), list(NUMERIC_FEATURES)),
-            ("type", OneHotEncoder(handle_unknown="ignore"), [TYPE_FEATURE]),
-        ],
-        remainder="drop",
-    )
-    if model_name == "dummy":
-        classifier: Any = DummyClassifier(strategy="prior")
-    elif model_name == "logistic":
-        classifier = LogisticRegression(
-            class_weight=class_weight,
-            max_iter=1_000,
-            random_state=RANDOM_STATE,
-        )
-    elif model_name == "decision_tree":
-        classifier = DecisionTreeClassifier(class_weight=class_weight, random_state=RANDOM_STATE)
-    elif model_name == "random_forest":
-        classifier = RandomForestClassifier(
-            n_estimators=200,
-            class_weight=class_weight,
-            n_jobs=-1,
-            random_state=RANDOM_STATE,
-        )
-    else:
-        allowed = "dummy, logistic, decision_tree, random_forest"
-        raise ValueError(f"不支持的 model_name={model_name!r}；可选值：{allowed}。")
-    return Pipeline(steps=[("preprocessor", preprocessor), ("classifier", classifier)])
+    """保留 Week 1 兼容入口，并复用 Day 14 的唯一预处理工厂。"""
+    return build_day14_model_pipeline(model_name, class_weight)
 
 
 def metric_values(y_true: pd.Series, probabilities: np.ndarray, threshold: float) -> dict[str, float]:
@@ -459,7 +433,7 @@ def save_error_analysis(
     return false_positive_path, false_negative_path, report_path
 
 
-def main() -> None:
+def main_week01_legacy() -> None:
     """运行完整且无测试集泄漏的 Day 6 训练流程。"""
     x_data, y_data = fetch_ai4i_data()
     splits = split_dataset(x_data, y_data)
@@ -546,6 +520,46 @@ def main() -> None:
     print(classification_report(splits.y_test, test_predictions, digits=4, zero_division=0))
     print(f"真实产物目录：{output_dir}")
     print(f"指标文件：{metrics_path}")
+
+
+def main() -> None:
+    """Run Day 14 model selection without allowing test data into any selection step."""
+    x_data, y_data = fetch_ai4i_data()
+    splits = split_dataset(x_data, y_data)
+    output_dir = ensure_output_dir("iot_failure_prediction")
+    baseline = compare_day14_models_cv(splits.x_train, splits.y_train)
+    baseline.to_csv(output_dir / "baseline_model_comparison.csv", index=False, encoding="utf-8-sig")
+    baseline.to_csv(output_dir / "model_comparison.csv", index=False, encoding="utf-8-sig")
+    tuned, tuned_estimators = tune_promising_models(splits.x_train, splits.y_train)
+    tuned.to_csv(output_dir / "tuned_model_comparison.csv", index=False, encoding="utf-8-sig")
+    selected_key = str(tuned.iloc[0]["model_key"])
+    selected_model = tuned_estimators[selected_key]["estimator"]
+    validation_probabilities = positive_probabilities(selected_model, splits.x_validation)
+    validation_default_metrics = metric_values(splits.y_validation, validation_probabilities, threshold=0.50)
+    threshold, threshold_table = select_validation_threshold(splits.y_validation, validation_probabilities)
+    validation_selected_metrics = metric_values(splits.y_validation, validation_probabilities, threshold)
+    selected_configuration = next(item for item in day14_model_configurations() if item.key == selected_key)
+    final_model = build_day14_model_pipeline(selected_configuration.model_name, selected_configuration.class_weight)
+    final_model.set_params(**tuned_estimators[selected_key]["params"])
+    final_model.fit(pd.concat([splits.x_train, splits.x_validation], ignore_index=True), pd.concat([splits.y_train, splits.y_validation], ignore_index=True))
+    test_probabilities = positive_probabilities(final_model, splits.x_test)
+    test_metrics = metric_values(splits.y_test, test_probabilities, threshold)
+    model_path, threshold_path = save_model_artifacts(final_model, threshold, output_dir)
+    matrix_path = save_confusion_matrix(splits.y_test, test_probabilities, threshold, output_dir)
+    pr_curve_path = save_precision_recall_curve(splits.y_test, test_probabilities, output_dir)
+    threshold_csv_path, threshold_image_path = save_threshold_analysis(threshold_table, threshold, output_dir)
+    importance_csv_path, importance_image_path = save_feature_importance(final_model, output_dir)
+    fp_path, fn_path, error_report_path = save_day14_error_analysis(splits.x_test, splits.y_test, test_probabilities, threshold, output_dir)
+    fig, ax = plt.subplots(figsize=(8, 5)); baseline_sorted = baseline.sort_values("cv_f1_mean"); ax.barh(baseline_sorted["model"], baseline_sorted["cv_f1_mean"]); ax.set(xlabel="Mean F1", title="AI4I baseline comparison (training CV only)"); fig.tight_layout(); comparison_plot_path = output_dir / "model_comparison.png"; fig.savefig(comparison_plot_path, dpi=150); plt.close(fig)
+    from sklearn.metrics import roc_curve
+    fpr, tpr, _ = roc_curve(splits.y_test, test_probabilities)
+    fig, ax = plt.subplots(figsize=(6, 5)); ax.plot(fpr, tpr, label=f"ROC-AUC = {test_metrics['roc_auc']:.4f}"); ax.plot([0, 1], [0, 1], "--", color="gray"); ax.set(xlabel="False positive rate", ylabel="True positive rate", title="AI4I final test ROC curve"); ax.legend(); ax.grid(alpha=0.3); fig.tight_layout(); roc_path = output_dir / "roc_curve.png"; fig.savefig(roc_path, dpi=150); plt.close(fig)
+    metrics_payload = {"dataset": "UCI AI4I 2020 Predictive Maintenance Dataset (id=601)", "random_state": RANDOM_STATE, "target": TARGET_COLUMN, "feature_columns": list(FEATURE_COLUMNS), "excluded_leakage_columns": list(LEAKAGE_COLUMNS), "splits": {"train_rows": int(len(splits.x_train)), "validation_rows": int(len(splits.x_validation)), "test_rows": int(len(splits.x_test)), "strategy": "stratified 60/20/20"}, "baseline_cross_validation": baseline.to_dict(orient="records"), "tuned_cross_validation": tuned.to_dict(orient="records"), "selection": {"model_key": selected_key, "model": selected_configuration.display_name, "threshold": threshold, "threshold_selected_on": "validation_set_only"}, "validation": {"at_0_50": validation_default_metrics, "at_selected_threshold": validation_selected_metrics}, "final_test_once": test_metrics, "artifacts": {"model": str(model_path), "threshold": str(threshold_path), "baseline": "baseline_model_comparison.csv", "tuned": "tuned_model_comparison.csv", "comparison_plot": str(comparison_plot_path), "confusion_matrix": str(matrix_path), "roc_curve": str(roc_path), "precision_recall_curve": str(pr_curve_path), "threshold_analysis": str(threshold_image_path), "feature_importance": str(importance_image_path), "false_positives": str(fp_path), "false_negatives": str(fn_path), "error_analysis": str(error_report_path), "feature_importance_csv": str(importance_csv_path), "threshold_analysis_csv": str(threshold_csv_path)}}
+    (output_dir / "final_test_metrics.json").write_text(json.dumps(metrics_payload, ensure_ascii=False, indent=2), encoding="utf-8")
+    (output_dir / "metrics.json").write_text(json.dumps(metrics_payload, ensure_ascii=False, indent=2), encoding="utf-8")
+    print("=== Day 14 · Week 2 Day 7 · AI4I model selection ===")
+    print(f"Selected tuned model: {selected_configuration.display_name}; validation threshold: {threshold:.4f}")
+    for name, value in test_metrics.items(): print(f"{name.upper()}: {value:.4f}")
 
 
 if __name__ == "__main__":

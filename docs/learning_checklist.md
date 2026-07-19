@@ -34,3 +34,12 @@
 
 - [x] 已由脚本验证：Day 1–Day 5 已在项目虚拟环境中运行；结果记录在根目录 README。
 - [x] 已由脚本验证：Day 6 已下载官方数据、生成真实指标、模型、阈值和分析产物；自动化测试已在项目虚拟环境中运行。
+
+## 第二周：模型选择与评估
+
+- [x] Day 08 / Week 2 Day 1：完成 KNN 的标准化 Pipeline、K 值验证集选择和最终测试。
+- [x] Day 09–Day 11：完成 Decision Tree、Random Forest 和 SVM 的真实实验、参数分析与图表。
+- [x] Day 12：完成训练集内的 StratifiedKFold 和 SVM GridSearchCV。
+- [x] Day 13：在相同 CV 折上比较 Dummy、Logistic、KNN、Tree、Forest 和 SVM。
+- [x] Day 14：完成 AI4I 的无泄漏基线比较、两项候选调参、验证集阈值选择、模型保存和错误分析。
+- [x] 已记录：AI4I 为合成预测性维护数据；UID/UDI、Product ID 与故障模式列不会进入预测特征。

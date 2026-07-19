@@ -1,0 +1,22 @@
+{
+  "random_state": 42,
+  "test_set_policy": "held out before GridSearchCV and not passed to fit",
+  "cross_validation": "StratifiedKFold(n_splits=5, shuffle=True, random_state=42)",
+  "scoring": "roc_auc",
+  "best_params": {
+    "svc__C": 10.0,
+    "svc__gamma": 0.01,
+    "svc__kernel": "rbf"
+  },
+  "best_score": 0.9963880288957689,
+  "best_fold_scores": [
+    0.9865841073271413,
+    0.9989680082559339,
+    0.9979360165118679,
+    0.9984520123839009,
+    1.0
+  ],
+  "best_fold_mean": 0.9963880288957689,
+  "best_fold_std": 0.00494925853799045,
+  "final_test_roc_auc": 0.9976851851851851
+}

@@ -1,0 +1,97 @@
+{
+  "validation_selection": {
+    "kernel": "linear",
+    "C": 0.1,
+    "gamma": "scale",
+    "train_accuracy": 0.9798994974874372,
+    "validation_accuracy": 0.9882352941176471
+  },
+  "final_test_accuracy": 0.9651162790697675,
+  "final_test_roc_auc": 0.990162037037037,
+  "parameter_analysis": [
+    {
+      "kernel": "linear",
+      "C": 0.1,
+      "gamma": "scale",
+      "train_accuracy": 0.9798994974874372,
+      "validation_accuracy": 0.9882352941176471
+    },
+    {
+      "kernel": "linear",
+      "C": 1.0,
+      "gamma": "scale",
+      "train_accuracy": 0.9899497487437185,
+      "validation_accuracy": 0.9882352941176471
+    },
+    {
+      "kernel": "linear",
+      "C": 10.0,
+      "gamma": "scale",
+      "train_accuracy": 0.992462311557789,
+      "validation_accuracy": 0.9882352941176471
+    },
+    {
+      "kernel": "rbf",
+      "C": 0.1,
+      "gamma": "scale",
+      "train_accuracy": 0.9597989949748744,
+      "validation_accuracy": 0.9529411764705882
+    },
+    {
+      "kernel": "rbf",
+      "C": 0.1,
+      "gamma": 0.01,
+      "train_accuracy": 0.957286432160804,
+      "validation_accuracy": 0.9647058823529412
+    },
+    {
+      "kernel": "rbf",
+      "C": 0.1,
+      "gamma": 0.1,
+      "train_accuracy": 0.9723618090452262,
+      "validation_accuracy": 0.9647058823529412
+    },
+    {
+      "kernel": "rbf",
+      "C": 1.0,
+      "gamma": "scale",
+      "train_accuracy": 0.9824120603015075,
+      "validation_accuracy": 0.9764705882352941
+    },
+    {
+      "kernel": "rbf",
+      "C": 1.0,
+      "gamma": 0.01,
+      "train_accuracy": 0.9798994974874372,
+      "validation_accuracy": 0.9764705882352941
+    },
+    {
+      "kernel": "rbf",
+      "C": 1.0,
+      "gamma": 0.1,
+      "train_accuracy": 0.9849246231155779,
+      "validation_accuracy": 0.9647058823529412
+    },
+    {
+      "kernel": "rbf",
+      "C": 10.0,
+      "gamma": "scale",
+      "train_accuracy": 0.992462311557789,
+      "validation_accuracy": 0.9882352941176471
+    },
+    {
+      "kernel": "rbf",
+      "C": 10.0,
+      "gamma": 0.01,
+      "train_accuracy": 0.9874371859296482,
+      "validation_accuracy": 0.9764705882352941
+    },
+    {
+      "kernel": "rbf",
+      "C": 10.0,
+      "gamma": 0.1,
+      "train_accuracy": 1.0,
+      "validation_accuracy": 0.9764705882352941
+    }
+  ]
+}
