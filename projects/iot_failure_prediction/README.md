@@ -30,6 +30,16 @@ Matzka, S. (2020). *AI4I 2020 Predictive Maintenance Dataset*. UCI Machine Learn
 
 以下标有“Week 1 历史实验快照”的段落来自 Day 6 的旧版候选流程；它们不描述当前模型，也不能与 Day 14 结果直接比较。
 
+## Day 14 模块职责与调用关系
+
+- `train.py`：Day 14 总入口；创建 60/20/20 分层划分，编排训练集比较、调参、验证集阈值选择、最终测试评价和产物保存。
+- `model_comparison.py`：在训练集相同的 `StratifiedKFold` 折上构建候选 Pipeline 并输出公平的基线比较。
+- `tune_models.py`：只使用训练数据，对最有希望的候选模型执行 `GridSearchCV`，将最佳估计器和实际超参数交回 `train.py`。
+- `error_analysis.py`：接收最终测试集的预测概率和已选阈值，生成 FP/FN CSV 与错误分析说明。
+- `predict.py`：独立加载 `train.py` 保存的最终 Pipeline 与验证集阈值，按正式特征列顺序进行单条设备预测。
+
+调用顺序为 `train.py → model_comparison.py → tune_models.py → error_analysis.py`；`predict.py` 不参与训练，而是读取最终模型包和阈值进行推理。
+
 ## 特征与目标
 
 允许进入特征矩阵的列严格只有六项：
@@ -158,11 +168,16 @@ python -m pytest -q
 
 | 产物 | 含义 |
 | --- | --- |
-| `model_comparison.csv` | 训练集 5 折模型对比表 |
-| `metrics.json` | 数据划分、CV 对比、验证阈值和最终一次测试指标 |
+| `baseline_model_comparison.csv` | Day 14 训练集五折基线模型比较表 |
+| `model_comparison.csv` | 当前 Day 14 基线比较表（与 `baseline_model_comparison.csv` 保持一致） |
+| `tuned_model_comparison.csv` | 仅在训练数据上调参后的候选比较与最佳超参数 |
+| `final_test_metrics.json` | 当前可复现最终模型、数据划分、CV、阈值和最终一次测试指标 |
+| `metrics.json` | 与最终指标同步保留的兼容性指标文件 |
 | `final_model.joblib` | 用训练集与验证集重训的最终 Pipeline |
 | `decision_threshold.json` | 只由验证集选择的阈值 |
+| `model_comparison.png` | 训练集 CV 基线比较图 |
 | `confusion_matrix.png` | 最终测试集混淆矩阵 |
+| `roc_curve.png` | 最终测试集 ROC 曲线 |
 | `precision_recall_curve.png` | 最终测试集 PR 曲线 |
 | `threshold_analysis.png` | 验证集阈值分析图 |
 | `feature_importance.png` | 最终非 Dummy 模型的重要特征 |
