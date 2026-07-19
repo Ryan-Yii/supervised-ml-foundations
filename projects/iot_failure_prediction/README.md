@@ -1,6 +1,6 @@
 # AI4I 设备故障预测
 
-这是 `supervised-ml-foundations` 的 Day 6 项目：以 UCI AI4I 2020 Predictive Maintenance Dataset 为基础，预测设备是否发生故障（`Machine failure`）。项目覆盖无泄漏特征、统一数据划分、多模型对比、验证集阈值选择、最终一次测试评估，以及可加载的单条预测。
+这是 `supervised-ml-foundations` 的 AI4I 项目：Day 6 的原始教学流程仍作为兼容入口保留，当前 `train.py` 执行 Day 14 模型选择流程，以 UCI AI4I 2020 Predictive Maintenance Dataset 预测设备是否发生故障（`Machine failure`）。项目覆盖无泄漏特征、统一数据划分、多模型对比、验证集阈值选择、最终一次测试评估，以及可加载的单条预测。
 
 ## 问题定义
 
@@ -23,6 +23,12 @@ Matzka, S. (2020). *AI4I 2020 Predictive Maintenance Dataset*. UCI Machine Learn
 ## 合成数据限制
 
 自动化测试使用小型合成记录，仅用来验证数据边界、Pipeline、模型/阈值保存加载和预测输入检查。它不用于训练展示模型，不产生报告指标，也不能代表 AI4I 数据分布。所有 `outputs/iot_failure_prediction/` 中的指标、图表和错误样本必须由真实 UCI 数据运行 `train.py` 后生成。
+
+## 当前可复现的 Day 14 最终结果
+
+当前 `train.py` 使用训练集五折 `StratifiedKFold` 比较候选模型并只在训练数据上执行 `GridSearchCV`；验证集仅选择阈值，测试集仅作最终一次评价。当前可复现的最终模型为 `DecisionTreeClassifier(max_depth=8, min_samples_leaf=1)`，验证集选择阈值为 `0.19`，最终测试 F1 为 `0.6438`。准确的完整指标、参数和输出清单以 [`final_test_metrics.json`](../../outputs/iot_failure_prediction/final_test_metrics.json)、同目录 CSV 以及当前 `train.py` 为准。
+
+以下标有“Week 1 历史实验快照”的段落来自 Day 6 的旧版候选流程；它们不描述当前模型，也不能与 Day 14 结果直接比较。
 
 ## 特征与目标
 
@@ -61,7 +67,7 @@ Matzka, S. (2020). *AI4I 2020 Predictive Maintenance Dataset*. UCI Machine Learn
 └── 测试集 20%：只在最终模型和阈值确定后评价一次
 ```
 
-除 `DummyClassifier` 基线外，逻辑回归、决策树和随机森林各比较普通训练与 `class_weight="balanced"` 训练。平衡权重会提高少数故障类的训练影响；它可能提高 Recall，也可能带来更多误报，因此必须结合 F1、PR-AUC 与错误分析判断。
+在 Week 1 历史流程中，除 `DummyClassifier` 基线外，逻辑回归、决策树和随机森林各比较普通训练与 `class_weight="balanced"` 训练。平衡权重会提高少数故障类的训练影响；它可能提高 Recall，也可能带来更多误报，因此必须结合 F1、PR-AUC 与错误分析判断。
 
 ## 模型比较与评价指标
 
@@ -78,11 +84,11 @@ Matzka, S. (2020). *AI4I 2020 Predictive Maintenance Dataset*. UCI Machine Learn
 - ROC-AUC：不同阈值下的排序能力。
 - PR-AUC（Average Precision）：更适合正类稀少时比较故障识别能力。
 
-最终模型从非 Dummy 候选中按交叉验证 **F1 → Recall → PR-AUC** 的顺序确定。实际表格将保存到 [`model_comparison.csv`](../../outputs/iot_failure_prediction/model_comparison.csv)。
+在 Week 1 历史流程中，最终模型从非 Dummy 候选中按交叉验证 **F1 → Recall → PR-AUC** 的顺序确定。当前 Day 14 的实际表格保存到 [`model_comparison.csv`](../../outputs/iot_failure_prediction/model_comparison.csv)。
 
-### 本次真实运行结果
+### Week 1 历史实验快照（不代表当前模型）
 
-在固定 `random_state=42`、训练集 6,000 条记录的 5 折交叉验证中，以下为故障正类的平均指标。完整六项指标和标准差见 [`model_comparison.csv`](../../outputs/iot_failure_prediction/model_comparison.csv)。
+在固定 `random_state=42`、训练集 6,000 条记录的 5 折交叉验证中，以下为旧版候选流程的故障正类平均指标。它们保留为历史教学记录；当前 `model_comparison.csv` 已由 Day 14 流程生成，不能用来复核该快照。
 
 | 模型 | class_weight | F1 | Recall | PR-AUC |
 | --- | --- | ---: | ---: | ---: |
@@ -94,7 +100,7 @@ Matzka, S. (2020). *AI4I 2020 Predictive Maintenance Dataset*. UCI Machine Learn
 | LogisticRegression | balanced | 0.2344 | 0.7935 | 0.4389 |
 | DummyClassifier | none | 0.0000 | 0.0000 | 0.0338 |
 
-平衡随机森林以最高 CV F1（0.6313）被选为最终模型；相较非平衡随机森林，它以较低 Precision 换取更高 Recall，并更符合本项目对故障类的关注重点。
+历史快照中，平衡随机森林以最高 CV F1（0.6313）被选为当时的最终模型；相较非平衡随机森林，它以较低 Precision 换取更高 Recall。
 
 ## 阈值选择
 
@@ -102,7 +108,7 @@ Matzka, S. (2020). *AI4I 2020 Predictive Maintenance Dataset*. UCI Machine Learn
 
 阈值及其来源保存在 `decision_threshold.json`；`predict.py` 使用这个保存的值，而非重新假定 0.5。验证集阈值表保存为 `validation_threshold_analysis.csv`。
 
-本次验证集将阈值从 0.50 调整为 **0.47**：F1 从 0.6129 提升至 0.6562，Recall 从 0.5588 提升至 0.6176。该选择发生在测试集评价之前。
+历史快照将阈值从 0.50 调整为 **0.47**：F1 从 0.6129 提升至 0.6562，Recall 从 0.5588 提升至 0.6176。该选择发生在历史测试集评价之前，并非当前 Day 14 的阈值。
 
 ## 错误分析
 
@@ -114,15 +120,15 @@ Matzka, S. (2020). *AI4I 2020 Predictive Maintenance Dataset*. UCI Machine Learn
 
 该摘要只描述模型错误样本的典型特征，不能据此作因果结论。真实运行后再阅读它，避免把假设当作实验结论。
 
-本次最终测试集共有 14 条误报和 23 条漏报。误报主要为 `Type=L`（10/14），平均转速 1687.29 rpm、扭矩 42.59 Nm；漏报中 `L/M` 类型分别为 11/10，平均转速 1447.52 rpm、扭矩 48.24 Nm、工具磨损 142.78 min。完整记录和原始统计请以对应 CSV 与 [`error_analysis.md`](../../outputs/iot_failure_prediction/error_analysis.md) 为准。
+历史最终测试集共有 14 条误报和 23 条漏报。误报主要为 `Type=L`（10/14），平均转速 1687.29 rpm、扭矩 42.59 Nm；漏报中 `L/M` 类型分别为 11/10，平均转速 1447.52 rpm、扭矩 48.24 Nm、工具磨损 142.78 min。该描述不对应当前 Day 14 输出；当前错误分析以同目录的实际 CSV 和 `error_analysis.md` 为准。
 
-### 最终测试集（一次评价）
+### Week 1 历史测试集（一次评价，不代表当前模型）
 
 | Accuracy | Precision | Recall | F1 | ROC-AUC | PR-AUC |
 | ---: | ---: | ---: | ---: | ---: | ---: |
 | 0.9815 | 0.7627 | 0.6618 | 0.7087 | 0.9741 | 0.7274 |
 
-测试集共 2,000 条记录，其中 68 条为故障。该表和所有图表均由实际运行生成，未用于模型或阈值选择。
+历史测试集共 2,000 条记录，其中 68 条为故障。该表由旧版实际运行生成，未用于当时的模型或阈值选择；它不对应当前 Day 14 输出。
 
 ## 运行命令
 
