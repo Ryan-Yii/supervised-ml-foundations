@@ -2,15 +2,18 @@
 
 覆盖 Week 1 与 Week 2、Day 01–Day 14 的监督学习（Supervised Machine Learning）项目记录。项目以 Python、物联网（IoT）和边缘计算（Edge Computing）基础为起点，通过一组小而完整的实验梳理数据、模型、评估、模型选择与数据泄漏（Data Leakage）。
 
-## 本周实践重点
+## 两周实践重点
 
 - 区分特征（Feature）和标签（Label），并完成基础数据探索。
 - 正确划分训练集（Training Set）、验证集（Validation Set）和测试集（Test Set）。
 - 使用 `Pipeline`、`ColumnTransformer` 将预处理与模型绑定，避免数据泄漏。
 - 理解回归（Regression）与分类（Classification）的常用评价指标。
 - 用一个物联网故障预测案例练习可复现、可保存、可预测的最小机器学习流程。
+- 比较 KNN、决策树、随机森林与 SVM，并按模型特性选择合适的预处理。
+- 使用训练集内的 `StratifiedKFold` 与 `GridSearchCV` 完成公平模型比较和调参。
+- 将 AI4I 的模型选择、验证集阈值选择与最终测试评价严格分离。
 
-## 学习进度与实践内容
+## 学习进度与实践内容（Day 01–Day 14）
 
 | 日期 | 主题 | 关键产物 |
 | --- | --- | --- |
@@ -20,6 +23,13 @@
 | Day 4 | 逻辑回归（Logistic Regression） | 分类报告、预测概率与混淆矩阵 |
 | Day 5 | 过拟合（Overfitting） | 决策树深度选择与训练/验证曲线 |
 | Day 6 | IoT 故障预测 | AI4I 数据、特征编码、模型保存与单样本预测 |
+| Day 08 · Week 2 Day 1 | K-Nearest Neighbors | 标准化 Pipeline、K 值验证集选择与最终测试 |
+| Day 09 · Week 2 Day 2 | Decision Tree | 树深度分析、特征重要性与最终测试 |
+| Day 10 · Week 2 Day 3 | Random Forest | 集成模型参数分析、特征重要性与最终测试 |
+| Day 11 · Week 2 Day 4 | Support Vector Machine | 标准化 SVM、核函数与参数分析 |
+| Day 12 · Week 2 Day 5 | Cross-validation 与 GridSearchCV | 训练集内分层交叉验证、SVM 网格搜索与最终测试 |
+| Day 13 · Week 2 Day 6 | 公平多模型比较 | 相同 CV 折上的 Dummy、线性、距离、树和 SVM 比较 |
+| Day 14 · Week 2 Day 7 | AI4I 项目升级、复习与验收 | 无泄漏模型选择、调参、阈值选择、错误分析与可加载推理 |
 
 ## 项目结构
 
